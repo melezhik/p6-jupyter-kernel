@@ -1,0 +1,6 @@
+init:
+ packages:
+   python: {}
+   zmq: {}
+ script: |
+    pip3 install jupyter
