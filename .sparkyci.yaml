@@ -1,6 +1,6 @@
 init:
  packages:
    python: {}
-   zmq: {}
+   zeromq: {}
  script: |
     pip3 install jupyter
