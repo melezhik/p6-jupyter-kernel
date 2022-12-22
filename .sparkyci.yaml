@@ -1,7 +1,0 @@
-init:
- packages:
-   build-essential: {}
-   python: {}
-   zeromq: {}
- script: |
-    pip3 install jupyter
