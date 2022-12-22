@@ -12,10 +12,13 @@ use nqp;
 state $iopub_supplier;
 
 
-sub mime-type($str) is export {
+sub mime-type($str) {
     return do given $str {
         when /:i ^ '<svg' / {
             'image/svg+xml';
+        }
+        when /:i ^ '<img' / {
+            'text/html';
         }
         default { 'text/plain' }
     }
@@ -32,11 +35,13 @@ my class Result does Jupyter::Kernel::Response {
 }
 
 class Std {
+    has $.mime-type is rw;
+
     # Use the channel to be sent all on the same thread
     # For data consistency
     method print(*@args) {
         my $text = @args.join.Str;
-        my $mime-type = mime-type($text);
+        my $mime-type = $.mime-type // mime-type($text);
         if $mime-type eq 'text/plain' {
             $iopub_supplier.emit: ('stream', {:$text, :name(self.stream_name)});
         } else {
@@ -81,13 +86,13 @@ class Jupyter::Kernel::Sandbox is export {
         INIT
     }
 
-    method eval(Str $code, Bool :$no-persist, Int :$store) {
+    method eval(Str $code, Bool :$no-persist, Int :$store, :$out-mime-type) {
         my $*CTXSAVE = $!repl;
         my $*MAIN_CTX;
         # without setting $PROCESS:: variants, output from Test.pm6
         # is not visible in the notebook.
-        $PROCESS::OUT = $*OUT = Out;
-        $PROCESS::ERR = $*ERR = Err;
+        $PROCESS::OUT = $*OUT = Out.new(mime-type => $out-mime-type);
+        $PROCESS::ERR = $*ERR = Err.new;
         my $exception;
         my $eval-code = $code;
         my $*JUPYTER = $.handler;
@@ -135,7 +140,7 @@ class Jupyter::Kernel::Sandbox is export {
         }
         given $output {
             $_ = Nil if .?__hide;
-            $_ = Nil if $_ ~~ List and .elems and .[*-1].?__hide;
+            $_ = Nil if try { $_ ~~ List and .elems and .[*-1].?__hide }
             $_ = Nil if $_ === Any;
         }
 

@@ -1,7 +1,7 @@
 {
     "name" : "Jupyter::Kernel",
-    "source-url" : "git://github.com/bduggan/p6-jupyter-kernel.git",
-    "perl" : "6.*",
+    "source-url" : "git://github.com/bduggan/raku-jupyter-kernel.git",
+    "raku" : "6.*",
     "build-depends" : [ ],
     "provides" : {
         "Jupyter::Kernel" : "lib/Jupyter/Kernel.rakumod",
@@ -24,7 +24,7 @@
     ],
     "description" : "Raku Kernel for Jupyter Notebooks",
     "test-depends" : [ ],
-    "version" : "0.0.18",
+    "version" : "0.0.20",
     "license" : "Artistic-2.0",
     "authors" : [
         "Brian Duggan"
